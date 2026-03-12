@@ -51,32 +51,32 @@ class MedicineDatabase:
         }
     
     def search_medicine(self, query: str, threshold: int = 80) -> Optional[Dict]:
-    """
-    Fuzzy search for medicine in database
-    """
-    if not query:
+        """
+        Fuzzy search for medicine in database
+        """
+        if not query:
+            return None
+    
+        medicine_names = list(self.medicines.keys())
+    
+        if not medicine_names:
+            return None
+    
+        best_match = process.extractOne(
+            query.lower(),
+            medicine_names,
+            scorer=fuzz.ratio
+        )
+    
+        if best_match is None:
+            return None
+    
+        match_name, score = best_match
+    
+        if score >= threshold:
+            return self.medicines.get(match_name)
+    
         return None
-
-    medicine_names = list(self.medicines.keys())
-
-    if not medicine_names:
-        return None
-
-    best_match = process.extractOne(
-        query.lower(),
-        medicine_names,
-        scorer=fuzz.ratio
-    )
-
-    if best_match is None:
-        return None
-
-    match_name, score = best_match
-
-    if score >= threshold:
-        return self.medicines.get(match_name)
-
-    return None
     
     def check_interactions(self, medicine: str, 
                          other_medicines: List[str] = None) -> Dict:
